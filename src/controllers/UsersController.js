@@ -1,4 +1,5 @@
 const AppError = require("../utils/AppError")
+const dbConnection = require('../database')
 
 class UsersController {
   create (req, res) {
