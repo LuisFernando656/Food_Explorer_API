@@ -1,7 +1,10 @@
-exports.up = knex => knex.schema.createTable('ingredients', function (table) {
+exports.up = knex => knex.schema.createTable('dishes', function (table) {
   table.increments('id').primary()
   table.string('name')
-  table.integer('dishe_id').references('id').inTable('dishes')
+  table.text('description')
+  table.decimal('price')
+  table.text('image')
+  table.string('category')
 })
 
-exports.down = knex => knex.schema.dropTableIfExists('ingredients')
+exports.down = knex => knex.schema.dropTableIfExists('dishes')
