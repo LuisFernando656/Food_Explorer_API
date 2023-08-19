@@ -65,6 +65,55 @@ class DishesController {
 
     return res.json()
   }
+
+  async show (req, res) {
+   const { id } = req.params
+
+   const dishes = await knex('dishes').where('id', id).first()
+   const ingredients = await knex('ingredients').where('dishe_id', id).orderBy('name')
+
+   return res.json({
+    ...dishes,
+    ingredients
+   })
+  }
+
+  async index (req, res) {
+    const { name, ingredients } = req.query
+
+    let dishes
+    
+    if(ingredients) {
+      const filterIngredients = ingredients.split(',').map(ingredient => ingredient.trim())
+
+      dishes = await knex('ingredients')
+      .select([
+        'dishes.id',
+        'dishes.name'
+      ])
+      .whereLike('dishes.name', `%${name}%`)
+      .whereIn('ingredients.name', filterIngredients)
+      .innerJoin('dishes', 'dishes.id', 'ingredients.dishe_id')
+      .orderBy('dishes.name')
+    }else{
+      dishes = await knex('dishes')
+      .whereLike('name', `%${name}%`)
+      .orderBy('name')
+    }
+
+    const dishesWithIngredients = await Promise.all(dishes.map( async dishe => {
+      const disheIngredients = await knex('ingredients')
+      .select('name')
+      .where('dishe_id', dishe.id);
+
+      return {
+        ...dishe,
+        ingredients: disheIngredients.map(ingredient => ingredient.name)
+      }
+    }))
+
+    return res.json(dishesWithIngredients)
+  }
 }
 
 module.exports = DishesController
