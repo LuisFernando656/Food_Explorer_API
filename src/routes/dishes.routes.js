@@ -1,15 +1,18 @@
 const { Router } = require('express')
 
 const DishesController = require('../controllers/DishesController')
+const ensureAuthenticated = require('../middlewares/ensureAuthenticated')
 
 const dishesController = new DishesController()
 
-const disheRouter = Router()
+const dishesRoutes = Router()
 
-disheRouter.post('/', dishesController.create)
-disheRouter.put('/:id', dishesController.update)
-disheRouter.delete('/:id', dishesController.delete)
-disheRouter.get('/:id', dishesController.show)
-disheRouter.get('/', dishesController.index)
+dishesRoutes.use(ensureAuthenticated)
 
-module.exports = disheRouter
+dishesRoutes.post('/', dishesController.create)
+dishesRoutes.put('/:id', dishesController.update)
+dishesRoutes.delete('/:id', dishesController.delete)
+dishesRoutes.get('/:id', dishesController.show)
+dishesRoutes.get('/', dishesController.index)
+
+module.exports = dishesRoutes
