@@ -4,7 +4,7 @@ exports.up = knex => knex.schema.createTable('dishes', function (table) {
   table.text('description')
   table.decimal('price')
   table.text('image')
-  table.string('category')
+  table.integer('category_id').references('id').inTable('category').onDelete('CASCADE')
 })
 
 exports.down = knex => knex.schema.dropTableIfExists('dishes')

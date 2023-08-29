@@ -3,13 +3,13 @@ const AppError = require('../utils/AppError')
 
 class DishesController {
   async create(req, res) {
-    const {name, description, price, category, ingredients} = req.body
+    const {name, description, price, category_id, ingredients} = req.body
 
     const [dishe_id] = await knex('dishes').insert({
       name,
       description,
       price,
-      category,
+      category_id
     })
 
     const ingredientsInsert = ingredients.map(ingredient => {
