@@ -15,7 +15,7 @@ const disheImageController = new DisheImageController()
 
 dishesRoutes.use(ensureAuthenticated)
 
-dishesRoutes.post('/', ensureAdminUser, dishesController.create)
+dishesRoutes.post('/', ensureAdminUser, upload.single('image') ,dishesController.create)
 dishesRoutes.put('/:id', ensureAdminUser, dishesController.update)
 dishesRoutes.delete('/:id', ensureAdminUser, dishesController.delete)
 dishesRoutes.get('/:id', dishesController.show)

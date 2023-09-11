@@ -1,15 +1,22 @@
 const knex = require('../database')
 const AppError = require('../utils/AppError')
+const DiskStorage = require('../providers/DiskStorage')
 
 class DishesController {
   async create(req, res) {
     const {name, description, price, category_id, ingredients} = req.body
+    const imageFilename = req.file.filename
+
+    const diskStorage = new DiskStorage()
+
+    const filename = await diskStorage.saveFile(imageFilename)
 
     const [dishe_id] = await knex('dishes').insert({
       name,
       description,
       price,
-      category_id
+      category_id,
+      image: filename
     })
 
     const ingredientsInsert = ingredients.map(ingredient => {
@@ -28,7 +35,6 @@ class DishesController {
     const { name, description, price, category, ingredients } = req.body
     const { id } = req.params
 
-    
     await knex('dishes')
     .where('id', id)
     .update({
