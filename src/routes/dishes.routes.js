@@ -20,6 +20,6 @@ dishesRoutes.put('/:id', ensureAdminUser, dishesController.update)
 dishesRoutes.delete('/:id', ensureAdminUser, dishesController.delete)
 dishesRoutes.get('/:id', dishesController.show)
 dishesRoutes.get('/', dishesController.index)
-dishesRoutes.patch('/image/:id', ensureAdminUser, upload.single('image'), disheImageController.update)
+dishesRoutes.patch('/image/:id', ensureAdminUser, upload.single('image'), disheImageController.update) 
 
 module.exports = dishesRoutes
