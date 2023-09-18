@@ -32,7 +32,7 @@ class DishesController {
   }
 
   async update(req, res) {
-    const { name, description, price, category, ingredients } = req.body
+    const { name, description, price, category_id, ingredients } = req.body
     const { id } = req.params
 
     await knex('dishes')
@@ -41,7 +41,7 @@ class DishesController {
       name,
       description,
       price,
-      category,
+      category_id,
     })
 
     await knex('ingredients')
