@@ -11,7 +11,7 @@ class DishesController {
 
     const filename = await diskStorage.saveFile(image)
 
-    const [dishe_id] = await knex('dishes').insert({ 
+    const [dish_id] = await knex('dishes').insert({ 
       name,
       description,
       price,
@@ -21,7 +21,7 @@ class DishesController {
 
     const ingredientsInsert = ingredients.map(ingredient => {
       return {
-        dishe_id,
+        dish_id,
         name: ingredient
       }
     })
@@ -44,22 +44,23 @@ class DishesController {
       category_id,
     })
 
-    await knex('ingredients')
-    .where('dishe_id', id)
-    .del()
-
     const ingredientsInsert = ingredients.map(ingredient => {
       return {
         name: ingredient,
-        dishe_id: id,
+        dish_id: id,
       };
     });
-  
-      if(!ingredientsInsert.lenght){
-        await knex('ingredients').insert(ingredientsInsert);
-      }else{
-        throw new AppError('Adicione os ingredientes')
-      }
+    
+    if(ingredientsInsert.length > 0){
+      await knex('ingredients')
+      .where('dish_id', id)
+      .del()
+
+
+      await knex('ingredients').insert(ingredientsInsert);
+    }else{
+      throw new AppError('Adicione os ingredientes')
+    }
 
     return res.json()
   }
@@ -76,7 +77,7 @@ class DishesController {
    const { id } = req.params
 
    const dishes = await knex('dishes').where('id', id).first()
-   const ingredients = await knex('ingredients').where('dishe_id', id).orderBy('name')
+   const ingredients = await knex('ingredients').where('dish_id', id).orderBy('name')
 
    return res.json({
     ...dishes,
@@ -85,35 +86,36 @@ class DishesController {
   }
 
   async index (req, res) {
-    const { name, ingredients } = req.query
+    const { search } = req.query
 
     let dishes
     
-    if(ingredients) {
-      const filterIngredients = ingredients.split(',').map(ingredient => ingredient.trim())
+    if(search) {
+      const filterValue = `%${search}%`
 
-      dishes = await knex('ingredients')
-      .select([
-        'dishes.id',
-        'dishes.name'
-      ])
-      .whereLike('dishes.name', `%${name}%`)
-      .whereIn('ingredients.name', filterIngredients)
-      .innerJoin('dishes', 'dishes.id', 'ingredients.dishe_id')
-      .orderBy('dishes.name')
+      dishes = await knex('dishes')
+      .where(function() {
+        this.where('name', 'like', filterValue)
+        .orWhereIn('id', function() {
+          this.select('dish_id')
+          .from('ingredients')
+          .where('name', 'like', filterValue)
+        })
+      })
+      .orderBy('name')
     }else{
       dishes = await knex('dishes')
-      .whereLike('name', `%${name}%`)
+      .whereLike('name', `%${search}%`)
       .orderBy('name')
     }
 
-    const dishesWithIngredients = await Promise.all(dishes.map( async dishe => {
+    const dishesWithIngredients = await Promise.all(dishes.map( async dish => {
       const disheIngredients = await knex('ingredients')
       .select('name')
-      .where('dishe_id', dishe.id);
+      .where('dish_id', dish.id);
 
       return {
-        ...dishe,
+        ...dish,
         ingredients: disheIngredients.map(ingredient => ingredient.name)
       }
     }))
