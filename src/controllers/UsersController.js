@@ -12,6 +12,10 @@ class UsersController {
       throw new AppError('Esse e-mail ja está em uso', 400)
     }
 
+    if(password.length < 6) {
+      throw new AppError('Senha muito curta, no mínimo 6 caracteres')
+    }
+
     const hashedPassword = await hash(password, 8)
 
     await knex('users').insert({
