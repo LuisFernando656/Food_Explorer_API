@@ -64,6 +64,6 @@
   </tr>
 </table>
 
-## Deploy link
+## Deploy
 
-https://food-explorer-api-3su0.onrender.com
+[Link to deploy](https://food-explorer-api-3su0.onrender.com)
